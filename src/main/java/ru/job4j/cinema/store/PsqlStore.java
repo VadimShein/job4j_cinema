@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -48,6 +49,7 @@ public class PsqlStore implements Store {
     public static Store instOf() {
         return Lazy.INST;
     }
+
     @Override
     public Map<Integer, List<Ticket>> findBusyTickets() {
         ConcurrentHashMap<Integer, List<Ticket>> cinemaHall = new ConcurrentHashMap<>();
@@ -61,19 +63,9 @@ public class PsqlStore implements Store {
                     int cell = it.getInt("cell");
                     int accountId = it.getInt("account_id");
                     Ticket ticket = new Ticket(session, row, cell, accountId);
-
-                    List<Ticket> gotTickets = cinemaHall.computeIfAbsent(row,
-                            k -> {
-                        List<Ticket> tickets = new ArrayList<>();
-                        tickets.add(ticket);
-                        return tickets;
-                    });
-                    if (!gotTickets.isEmpty()) {
-                        gotTickets.add(ticket);
-                        cinemaHall.put(it.getInt("row"), gotTickets);
-                    }
+                    cinemaHall.putIfAbsent(it.getInt("row"), new ArrayList<>());
+                    cinemaHall.get(it.getInt("row")).add(ticket);
                 }
-                System.out.println("cinSize" + cinemaHall.size());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -119,7 +111,7 @@ public class PsqlStore implements Store {
                     ticketId = id.getInt(1);
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
         }
         return ticketId;

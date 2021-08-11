@@ -1,6 +1,7 @@
 package ru.job4j.cinema.servlet;
 
 import org.json.JSONObject;
+import ru.job4j.cinema.model.Account;
 import ru.job4j.cinema.model.Ticket;
 import ru.job4j.cinema.store.PsqlStore;
 
@@ -21,14 +22,27 @@ public class HallServlet extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
         Map<Integer, List<Ticket>> cinemaHall = PsqlStore.instOf().findBusyTickets();
 
-        int pr = cinemaHall.size();
-        System.out.println("HallSize: " + pr);
-
         JSONObject jsonObj = new JSONObject();
         for (Map.Entry<Integer, List<Ticket>> row : cinemaHall.entrySet()) {
             jsonObj.put(Integer.toString(row.getKey()), row.getValue());
         }
         PrintWriter writer = new PrintWriter(resp.getOutputStream(), true, StandardCharsets.UTF_8);
         writer.println(jsonObj.toString());
+    }
+
+    @Override
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        req.setCharacterEncoding("UTF-8");
+        Account account = new Account(
+                req.getParameter("username"),
+                req.getParameter("email"),
+                req.getParameter("phone"));
+        Ticket ticket = new Ticket(
+                1,
+                Integer.parseInt(req.getParameter("row")),
+                Integer.parseInt(req.getParameter("cell")),
+               0);
+        PsqlStore.instOf().buyTicket(account, ticket);
+        resp.sendRedirect(req.getContextPath() + "/index.html");
     }
 }

@@ -7,9 +7,9 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
-    <title>Hello, world!</title>
+    <title>Cinema</title>
 </head>
-<body>
+<body onload="updateTickets()">
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
@@ -30,19 +30,19 @@
             </tr>
             </thead>
             <tbody>
-            <tr id="1">
+            <tr id="tr1">
                 <th>1</th>
                 <td><input type="radio" name="place" value="11"> Ряд 1, Место 1</td>
                 <td><input type="radio" name="place" value="12"> Ряд 1, Место 2</td>
                 <td><input type="radio" name="place" value="13"> Ряд 1, Место 3</td>
             </tr>
-            <tr id="2">
+            <tr id="tr2">
                 <th>2</th>
                 <td><input type="radio" name="place" value="21"> Ряд 2, Место 1</td>
                 <td><input type="radio" name="place" value="22"> Ряд 2, Место 2</td>
                 <td><input type="radio" name="place" value="23"> Ряд 2, Место 3</td>
             </tr>
-            <tr id="3">
+            <tr id="tr3">
                 <th>3</th>
                 <td><input type="radio" name="place" value="31"> Ряд 3, Место 1</td>
                 <td><input type="radio" name="place" value="32"> Ряд 3, Место 2</td>
@@ -52,37 +52,39 @@
         </table>
     </div>
     <div class="row float-right">
-        <form>
-            <button type="button" class="btn btn-success" onclick="updateTickets()">Оплатить</button>
-        </form>
+            <button type="button" class="btn btn-success" onclick="getTicket()">Оплатить</button>
     </div>
 </div>
 
 <script>
     function updateTickets() {
+         setTimeout(updateTickets, 2000)
         $.ajax({
             type: 'GET',
             crossDomain : true,
             url: 'http://localhost:8080/job4j_cinema/hall',
             dataType: 'text',
         }).done(function(data) {
-             // console.log(data)
-             // let dt = JSON.parse(data)
-
-            // for (const [key, value] of Object.entries(dt)) {
-            //
-            //     let parent = document.querySelector('tbody')
-            //     let row = parent.querySelector(key)
-            //
-            //     let cell = document.createElement('td')
-            //     cell.innerHTML = `${value[0].cell}`
-            //     let el = document.createElement('option')
-            //     el.innerHTML = `${value}`
-            //     parent.appendChild(el)
-            // }
-        }).fail(function(err) {
-            alert(err);
+            let dt = JSON.parse(data)
+            for (const [key, value] of Object.entries(dt)) {
+                let parent = document.querySelector('tbody')
+                let fRow = parent.querySelector('#tr' + key)
+                for (let i = 0; i < value.length; i++) {
+                    let selector = "[value='" + value[i].row + value[i].cell + "']"
+                    let td = fRow.querySelector(selector)
+                    if (td != null) {
+                        td.parentNode.removeChild(td)
+                    }
+                }
+        }
         });
+    }
+
+    function getTicket() {
+        let value = document.querySelector("input[name=place]:checked").value
+        let row = value[0]
+        let cell = value[1]
+         window.location.href = "http://localhost:8080/job4j_cinema/payment.html?row=" + row + "&cell=" + cell
     }
 </script>
 </body>
