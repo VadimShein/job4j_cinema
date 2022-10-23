@@ -10,6 +10,13 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
+    <style type="text/css">
+        TABLE {
+            text-align: center;
+        }
+
+    </style>
+
     <title>Cinema</title>
 </head>
 <body onload="updateTickets()">
@@ -58,7 +65,7 @@
                     </tbody>
                 </table>
                 <div class="row pt-3">
-                    <button type="button" class="btn btn-success" onclick="getTicket()">Оплатить</button>
+                    <button style="margin-left: 20px" type="button" class="btn btn-success" onclick="getTicket()">Оплатить</button>
                 </div>
             </div>
         </div>
