@@ -5,6 +5,7 @@ import ru.job4j.cinema.model.Account;
 import ru.job4j.cinema.model.Ticket;
 import ru.job4j.cinema.store.PsqlStore;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,7 +32,8 @@ public class HallServlet extends HttpServlet {
     }
 
     @Override
-    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+        String answer;
         req.setCharacterEncoding("UTF-8");
         Account account = new Account(
                 req.getParameter("username"),
@@ -42,7 +44,11 @@ public class HallServlet extends HttpServlet {
                 Integer.parseInt(req.getParameter("row")),
                 Integer.parseInt(req.getParameter("cell")),
                0);
-        PsqlStore.instOf().buyTicket(account, ticket);
-        resp.sendRedirect(req.getContextPath() + "/index.html");
+        if (PsqlStore.instOf().buyTicket(account, ticket)) {
+            answer = "Билет успешно приобретен";
+        } else {
+            answer = "Билет уже занят";
+        }
+        resp.sendRedirect(req.getContextPath() + "/index.jsp");
     }
 }

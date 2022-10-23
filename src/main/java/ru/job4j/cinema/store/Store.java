@@ -8,5 +8,7 @@ import java.util.Map;
 
 public interface Store {
     Map<Integer, List<Ticket>> findBusyTickets();
-    int buyTicket(Account account, Ticket ticket);
+    boolean buyTicket(Account account, Ticket ticket);
+    int saveAccount(Account account);
+    Account findAccount(Account account);
 }
